@@ -6,7 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
-import com.repositories.DroneRepository;
+import com.model.Drone;
+import com.service.DroneService;
 
 @SpringBootApplication
 public class StartApplication {
@@ -19,11 +20,13 @@ public class StartApplication {
     // run this only on profile 'demo', avoid run this in test
     @Profile("demo")
     @Bean
-    CommandLineRunner initDatabase(DroneRepository repository) {
+    CommandLineRunner initDatabase(DroneService service) {
        return args -> {
-           // repository.save(new Book("Lord of the Rings", "J.R.R. Tolkien", new BigDecimal("25.41")));
-           // repository.save(new Book("Harry Potter and the Sorcerer's Stone", "J.K. Rowling", new BigDecimal("24.41")));
-           // repository.save(new Book("Twenty Thousand Leagues Under the Sea", "Jules Verne", new BigDecimal("15.25")));
+          service.registerDrone("serialNumberA","Middleweight");
+          service.registerDrone("serialNumberB","Lightweight");
+          service.registerDrone("serialNumberC","Middleweight");
+
+
         };
     }
 }

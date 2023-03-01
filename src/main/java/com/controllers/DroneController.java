@@ -2,42 +2,62 @@ package com.controllers;
 
 import com.error.DroneNotFoundException;
 import com.model.Drone;
+import com.model.RegisterDrone;
 import com.repositories.DroneRepository;
+import com.service.DroneService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 public class DroneController {
 
     @Autowired
-    private DroneRepository repository;
-
+    private DroneService droneService;
 
     @RequestMapping(value = "/list", method= RequestMethod.GET, produces = "application/json")
     @GetMapping("/list")
-    List<Drone> findAll() {
-        return repository.findAll();
+    public List<Drone> list() {
+        return droneService.findAll();
     }
 
     // Save
-    @PostMapping("/drone")
-    //return 201 instead of 200
-    @ResponseStatus(HttpStatus.CREATED)
-    Drone newDrone(@RequestBody Drone newDrone) {
-        return repository.save(newDrone);
+
+    @ApiOperation(value = "Register a Drone")
+    @RequestMapping(value = "/registerDrone", method = RequestMethod.POST, produces = "application/json")
+    public ResponseEntity registerDrone(@RequestBody RegisterDrone registerDrone)
+    {   try {
+          droneService.registerDrone(registerDrone.getSerial(), registerDrone.getModel());
+         } catch (RuntimeException e){
+             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+
+        return new ResponseEntity("Drone Register Successfully", HttpStatus.OK);
     }
 
     // Find
     @GetMapping("/drone/{id}")
-    Drone findOne(@PathVariable long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new DroneNotFoundException(id));
+    public Drone findOne(@PathVariable long id) {
+        return droneService.findById(id);
+
     }
+
+    // Find
+    @GetMapping("/batteryLevel/{id}")
+    public int batteryLevel(@PathVariable long id) {
+
+        return droneService.findById(id).getBatteryCapacity();
+
+    }
+
+
 /*
     // Save or update
     @PutMapping("/books/{id}")
